@@ -19,6 +19,7 @@ export const DoctorsList: React.FC<DoctorsListProps> = ({
   const searchTerm = getParam("search");
   const consultType = getParam("consultType");
   const specialties = getArrayParam("specialties");
+  const cities = getArrayParam("cities");
   const sortBy = getParam("sortBy");
 
   const filteredDoctors = useMemo(() => {
@@ -28,7 +29,14 @@ export const DoctorsList: React.FC<DoctorsListProps> = ({
       .filter((doctor) => {
         // Filter by search term
         if (searchTerm) {
-          if (!doctor.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+          const searchLower = searchTerm.toLowerCase();
+          const matchesName = doctor.name.toLowerCase().includes(searchLower);
+          const matchesClinic = doctor.clinic?.name?.toLowerCase().includes(searchLower);
+          const matchesAddress = doctor.clinic?.address?.address_line1?.toLowerCase().includes(searchLower) ||
+                                doctor.clinic?.address?.locality?.toLowerCase().includes(searchLower) ||
+                                doctor.clinic?.address?.city?.toLowerCase().includes(searchLower);
+          
+          if (!matchesName && !matchesClinic && !matchesAddress) {
             return false;
           }
         }
@@ -53,6 +61,14 @@ export const DoctorsList: React.FC<DoctorsListProps> = ({
           }
         }
 
+        // Filter by cities
+        if (cities.length > 0) {
+          const doctorCity = doctor.clinic?.address?.city;
+          if (!doctorCity || !cities.includes(doctorCity)) {
+            return false;
+          }
+        }
+
         return true;
       })
       .sort((a, b) => {
@@ -70,7 +86,7 @@ export const DoctorsList: React.FC<DoctorsListProps> = ({
         }
         return 0;
       });
-  }, [doctors, searchTerm, consultType, specialties, sortBy, isLoading, error]);
+  }, [doctors, searchTerm, consultType, specialties, cities, sortBy, isLoading, error]);
 
   if (isLoading) {
     return (

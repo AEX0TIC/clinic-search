@@ -61,6 +61,19 @@ export const DoctorCard: React.FC<DoctorCardProps> = ({ doctor }) => {
           )}
         </div>
         
+        {/* Clinic Information */}
+        {doctor.clinic && (
+          <div className="mb-3">
+            <h3 className="text-sm font-semibold text-gray-800 mb-1">
+              {doctor.clinic.name}
+            </h3>
+            <div className="text-sm text-gray-600">
+              <p className="mb-1">{doctor.clinic.address.address_line1}</p>
+              <p className="mb-1">{doctor.clinic.address.locality}, {doctor.clinic.address.city}</p>
+            </div>
+          </div>
+        )}
+        
         <div>
           <span data-testid="doctor-fee" className="text-xl font-bold text-green-600">
             ₹ {parseInt(doctor.fees.replace(/[^0-9]/g, ""), 10)}

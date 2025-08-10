@@ -5,6 +5,19 @@ export interface Specialty {
   name: string;
 }
 
+export interface ClinicAddress {
+  locality: string;
+  city: string;
+  address_line1: string;
+  location: string;
+  logo_url: string;
+}
+
+export interface Clinic {
+  name: string;
+  address: ClinicAddress;
+}
+
 export interface Doctor {
   id: string;
   name: string;
@@ -14,6 +27,7 @@ export interface Doctor {
   fees: string;
   video_consult: boolean;
   in_clinic: boolean;
+  clinic: Clinic;
 }
 
 // Function to fetch doctors data from the API
@@ -26,7 +40,8 @@ const fetchDoctors = async (): Promise<Doctor[]> => {
     }
     
     const data = await response.json();
-    return data;
+    // The API returns an object with a 'data' property containing the doctors array
+    return data.data || data;
   } catch (error) {
     console.error("Error fetching doctors:", error);
     throw error;

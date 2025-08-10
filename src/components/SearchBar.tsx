@@ -14,9 +14,16 @@ export const SearchBar: React.FC<SearchBarProps> = ({ doctors }) => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const filteredDoctors = doctors
-    .filter((doctor) =>
-      doctor.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+    .filter((doctor) => {
+      const searchLower = searchTerm.toLowerCase();
+      return (
+        doctor.name?.toLowerCase().includes(searchLower) ||
+        doctor.clinic?.name?.toLowerCase().includes(searchLower) ||
+        doctor.clinic?.address?.address_line1?.toLowerCase().includes(searchLower) ||
+        doctor.clinic?.address?.locality?.toLowerCase().includes(searchLower) ||
+        doctor.clinic?.address?.city?.toLowerCase().includes(searchLower)
+      );
+    })
     .slice(0, 3);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,7 +77,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ doctors }) => {
           value={searchTerm}
           onChange={handleSearchChange}
           onFocus={() => setIsFocused(true)}
-          placeholder="Search for doctors..."
+          placeholder="Search for doctors, clinics, or locations..."
           className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500 search-input text-gray-700"
         />
       </form>
@@ -87,7 +94,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({ doctors }) => {
               onClick={() => handleSuggestionClick(doctor.name)}
               className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0"
             >
-              <span className="font-medium text-gray-700">{doctor.name}</span>
+              <div className="flex flex-col">
+                <span className="font-medium text-gray-700">{doctor.name}</span>
+                {doctor.clinic && (
+                  <span className="text-sm text-gray-500">
+                    {doctor.clinic.name} • {doctor.clinic.address?.locality}, {doctor.clinic.address?.city}
+                  </span>
+                )}
+              </div>
             </div>
           ))}
         </div>

@@ -17,8 +17,17 @@ export const DoctorFilter: React.FC<DoctorFilterProps> = ({ doctors }) => {
     return Array.from(new Set(allSpecialties)).sort();
   }, [doctors]);
 
+  // Get unique cities from the doctors data
+  const cities = React.useMemo(() => {
+    const allCities = doctors
+      .filter(doctor => doctor.clinic?.address?.city)
+      .map(doctor => doctor.clinic.address.city);
+    return Array.from(new Set(allCities)).sort();
+  }, [doctors]);
+
   const selectedConsultType = getParam("consultType");
   const selectedSpecialties = getArrayParam("specialties");
+  const selectedCities = getArrayParam("cities");
   const sortBy = getParam("sortBy");
 
   const handleConsultTypeChange = (type: string) => {
@@ -34,6 +43,18 @@ export const DoctorFilter: React.FC<DoctorFilterProps> = ({ doctors }) => {
       );
     } else {
       setArrayParam("specialties", [...selectedSpecialties, specialty]);
+    }
+  };
+
+  const handleCityChange = (city: string) => {
+    const isSelected = selectedCities.includes(city);
+    if (isSelected) {
+      setArrayParam(
+        "cities",
+        selectedCities.filter((c) => c !== city)
+      );
+    } else {
+      setArrayParam("cities", [...selectedCities, city]);
     }
   };
 
@@ -96,6 +117,30 @@ export const DoctorFilter: React.FC<DoctorFilterProps> = ({ doctors }) => {
                 className="h-4 w-4 rounded text-blue-600 focus:ring-blue-500 mr-3"
               />
               <span className="text-gray-700">{specialty}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Location Filter */}
+      <div className="mb-6">
+        <h3 
+          data-testid="filter-header-location"
+          className="font-semibold text-lg mb-3 text-gray-800"
+        >
+          Location
+        </h3>
+        <div className="space-y-3 max-h-40 overflow-y-auto pr-2">
+          {cities.map((city) => (
+            <label key={city} className="flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                data-testid={`filter-city-${city.replace(/\s+/g, "-")}`}
+                checked={selectedCities.includes(city)}
+                onChange={() => handleCityChange(city)}
+                className="h-4 w-4 rounded text-blue-600 focus:ring-blue-500 mr-3"
+              />
+              <span className="text-gray-700">{city}</span>
             </label>
           ))}
         </div>
