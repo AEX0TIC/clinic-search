@@ -11,22 +11,46 @@ const LoginPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Form submitted with:', { email, password });
     setIsLoading(true);
     setError("");
 
     try {
+      console.log('Calling AuthService.login...');
       await AuthService.login({ email, password });
+      console.log('Login successful, navigating to /');
       navigate("/");
     } catch (err: any) {
+      console.error('Login error:', err);
       setError(err.message || "Login failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDemoLogin = () => {
+  const handleDemoLogin = async () => {
+    console.log('Demo login clicked');
     setEmail("demo@example.com");
     setPassword("demo123");
+    
+    // Automatically submit the form after a brief delay to ensure state updates
+    setTimeout(async () => {
+      console.log('Auto-submitting demo login...');
+      setIsLoading(true);
+      setError("");
+      
+      try {
+        console.log('Calling AuthService.login with demo credentials...');
+        await AuthService.login({ email: "demo@example.com", password: "demo123" });
+        console.log('Demo login successful, navigating to /');
+        navigate("/");
+      } catch (err: any) {
+        console.error('Demo login error:', err);
+        setError(err.message || "Demo login failed. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    }, 100);
   };
 
   return (

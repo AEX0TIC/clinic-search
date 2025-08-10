@@ -1,5 +1,4 @@
-const API_BASE_URL = 'http://localhost:3001/api';
-
+// Mock authentication service that works without database
 export interface LoginCredentials {
   email: string;
   password: string;
@@ -8,8 +7,8 @@ export interface LoginCredentials {
 export interface RegisterData {
   email: string;
   password: string;
-  first_name: string;
-  last_name: string;
+  firstName: string;
+  lastName: string;
 }
 
 export interface User {
@@ -17,121 +16,103 @@ export interface User {
   email: string;
   first_name: string;
   last_name: string;
-  created_at?: string;
 }
 
 export interface AuthResponse {
-  token: string;
   user: User;
+  token: string;
 }
 
 class AuthService {
-  private static getAuthHeaders(): HeadersInit {
-    const token = localStorage.getItem('authToken');
-    return {
-      'Content-Type': 'application/json',
-      ...(token && { Authorization: `Bearer ${token}` }),
-    };
-  }
+  private static readonly MOCK_USER: User = {
+    id: 1,
+    email: 'demo@example.com',
+    first_name: 'Demo',
+    last_name: 'User'
+  };
+
+  private static readonly MOCK_TOKEN = 'mock-jwt-token-12345';
 
   static async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
-      }
-
-      const data = await response.json();
+    console.log('AuthService.login called with:', credentials);
+    
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Check against hardcoded demo credentials
+    if (credentials.email === 'demo@example.com' && credentials.password === 'demo123') {
+      console.log('Demo credentials matched, setting localStorage');
       
-      // Store token and user data
-      localStorage.setItem('authToken', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
+      // Store in localStorage
+      localStorage.setItem('token', this.MOCK_TOKEN);
+      localStorage.setItem('user', JSON.stringify(this.MOCK_USER));
       localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userEmail', data.user.email);
-
-      return data;
-    } catch (error) {
-      console.error('Login error:', error);
-      throw error;
+      
+      console.log('localStorage set, returning response');
+      
+      return {
+        user: this.MOCK_USER,
+        token: this.MOCK_TOKEN
+      };
     }
+    
+    console.log('Invalid credentials');
+    throw new Error('Invalid email or password');
   }
 
   static async register(userData: RegisterData): Promise<AuthResponse> {
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Registration failed');
-      }
-
-      const data = await response.json();
-      
-      // Store token and user data
-      localStorage.setItem('authToken', data.token);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userEmail', data.user.email);
-
-      return data;
-    } catch (error) {
-      console.error('Registration error:', error);
-      throw error;
-    }
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // For demo purposes, always succeed
+    const newUser: User = {
+      id: Date.now(),
+      email: userData.email,
+      first_name: userData.firstName,
+      last_name: userData.lastName
+    };
+    
+    // Store in localStorage
+    localStorage.setItem('token', this.MOCK_TOKEN);
+    localStorage.setItem('user', JSON.stringify(newUser));
+    localStorage.setItem('isLoggedIn', 'true');
+    
+    return {
+      user: newUser,
+      token: this.MOCK_TOKEN
+    };
   }
 
   static async getCurrentUser(): Promise<User | null> {
-    try {
-      const token = localStorage.getItem('authToken');
-      if (!token) return null;
-
-      const response = await fetch(`${API_BASE_URL}/auth/user`, {
-        headers: this.getAuthHeaders(),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to get user data');
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Get user error:', error);
-      return null;
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      return JSON.parse(userStr);
     }
+    return null;
   }
 
   static logout(): void {
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('token');
     localStorage.removeItem('user');
     localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('userEmail');
   }
 
   static isAuthenticated(): boolean {
-    return localStorage.getItem('authToken') !== null;
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    console.log('AuthService.isAuthenticated called, result:', isLoggedIn);
+    return isLoggedIn;
   }
 
   static getToken(): string | null {
-    return localStorage.getItem('authToken');
+    return localStorage.getItem('token');
   }
 
   static getUser(): User | null {
     const userStr = localStorage.getItem('user');
-    return userStr ? JSON.parse(userStr) : null;
+    if (userStr) {
+      return JSON.parse(userStr);
+    }
+    return null;
   }
 }
 
