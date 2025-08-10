@@ -45,12 +45,31 @@ Open [http://localhost:5173](http://localhost:5173) with your browser to see the
 
 ## Features
 
-- Search for doctors by name
-- Filter by consultation type (Video/In-clinic)
-- Filter by specialties
-- Sort by fees or experience
-- Mobile-responsive design
-- Real-time search suggestions
+- 🔐 **User Authentication** - Secure login system with protected routes
+- 👨‍⚕️ **Doctor Search** - Search for doctors by name
+- 🔍 **Advanced Filtering** - Filter by consultation type (Video/In-clinic)
+- 🏥 **Specialty Filtering** - Filter by medical specialties
+- 📊 **Sorting Options** - Sort by fees or experience
+- 📱 **Mobile-Responsive** - Optimized for all device sizes
+- ⚡ **Real-time Search** - Instant search suggestions
+- 🎨 **Modern UI** - Clean, accessible design with Tailwind CSS
+
+## Authentication
+
+The application includes a complete authentication system:
+
+- **Login Page** - Secure login with email and password
+- **Protected Routes** - Automatic redirection to login for unauthenticated users
+- **Session Management** - Persistent login state using localStorage
+- **Logout Functionality** - Secure logout with session cleanup
+- **Demo Login** - Quick access for testing purposes
+
+### Demo Login
+For testing purposes, you can use:
+- **Email:** demo@example.com
+- **Password:** demo123
+
+Or click the "Try Demo Login" button on the login page.
 
 ## Project Structure
 
@@ -58,12 +77,15 @@ Open [http://localhost:5173](http://localhost:5173) with your browser to see the
 src/
 ├── components/          # React components
 │   ├── ui/             # Reusable UI components
+│   ├── LoginPage.tsx   # Login page component
+│   ├── Header.tsx      # Navigation header with logout
+│   ├── ProtectedRoute.tsx # Authentication wrapper
 │   └── ...
 ├── hooks/              # Custom React hooks
 ├── lib/                # Utility libraries
 ├── services/           # API services
 ├── utils/              # Utility functions
-├── App.tsx             # Main App component
+├── App.tsx             # Main App component with routing
 ├── main.tsx            # Application entry point
 └── index.css           # Global styles
 ```
