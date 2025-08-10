@@ -26,7 +26,7 @@ export const DoctorCard: React.FC<DoctorCardProps> = ({ doctor }) => {
 
       <div className="flex-grow">
         <h2 data-testid="doctor-name" className="text-xl font-bold text-blue-700 mb-1">
-          Dr. {doctor.name}
+          {doctor.name}
         </h2>
         
         <div className="mb-2">
